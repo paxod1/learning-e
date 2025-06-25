@@ -1,0 +1,19 @@
+/* Hide the timeline */
+.video-js .vjs-progress-control {
+    display: none !important;
+}
+
+/* Hide the big play button */
+.video-js .vjs-big-play-button {
+    display: none !important;
+}
+
+/* Hide the remaining time display */
+.video-js .vjs-remaining-time {
+    display: none !important;
+}
+
+/* Hide the fullscreen button */
+.video-js .vjs-fullscreen-control {
+    display: none !important;
+}

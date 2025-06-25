@@ -1,0 +1,66 @@
+.ad-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5vw;
+    z-index: 1002;
+    box-sizing: border-box;
+}
+
+
+.ad-card {
+    width: 50%;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    transition: transform 0.3s ease;
+    height: 600px;
+}
+
+.ad-card:hover {
+    transform: scale(1.01);
+}
+
+.ad-image {
+    width: 100%;
+    height: 600px;
+}
+
+.close-btn {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    background-color: #000000;
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 16px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    line-height: 30px;
+    text-align: center;
+    padding: 0;
+    z-index: 1005;
+}
+
+@media (max-width:750px) {
+    .ad-card {
+        width: 320px;
+        height: 570px;
+    }
+
+    .ad-image {
+        width: 100%;
+        height: 570px;
+    }
+
+}
