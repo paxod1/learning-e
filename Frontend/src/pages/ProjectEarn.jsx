@@ -24,13 +24,14 @@ function ProjectEarn() {
 
     const logininfom = useSelector((state) => state.userlogin?.LoginInfo[0]); // Gets login info from Redux
     var pro_stud_id = logininfom.trainingIdArrayProject[0]
+    var project_id = logininfom.pro_stud_id
 
     useEffect(() => {
         const fetchEarnings = async () => {
             try {
-                // const res = await TokenRequest.get(`/student/earnings?student_id=${logininfom.student_id}`);
-                // console.log("earinings>>>>>.", res.data.total_earnings);
-                setCoinsEarned(0)
+                const res = await TokenRequest.get(`/project/earnings?pro_stud_id=${logininfom.trainingIdArrayProject[0]}`);
+                console.log("earinings>>>>>.", res.data.total_earnings);
+                setCoinsEarned(res.data.total_earnings)
 
 
             } catch (err) {
@@ -98,12 +99,15 @@ function ProjectEarn() {
         setShowCoins(false);
 
         try {
-            await TokenRequest.post('/student/addreferencedata', {
+            console.log("HI");
+            
+            await TokenRequest.post('/project/addreferencedata', {
                 ref_name: referralData.name,
                 ref_email: referralData.email,
                 ref_contact: referralData.contact,
                 earnings: 0,
-
+                pro_stud_id,
+                project_id
             });
 
             // Clear the form

@@ -181,4 +181,83 @@ router.get('/getdataAnnouncementsid', verifyToken, async (req, res) => {
 
 
 
+
+// get earinig
+router.get('/earnings', async (req, res) => {
+    const { pro_stud_id } = req.query;
+
+    if (!pro_stud_id) {
+        return res.status(400).json({ error: 'pro_stud_id is required' });
+    }
+
+    try {
+        const [rows] = await db.query(
+            'SELECT SUM(earnings) AS total_earnings FROM tbl_project_reference WHERE pro_stud_id = ?',
+            [pro_stud_id]
+        );
+        res.json({ total_earnings: rows[0].total_earnings || 0 });
+    } catch (error) {
+        console.error('Error fetching earnings:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// add reference data
+router.post('/addreferencedata', verifyToken, async (req, res) => {
+     console.log("Received reference data:", req.body);
+    const {
+        ref_name,
+        ref_email,
+        ref_contact,
+        earnings,
+        pro_stud_id,
+        project_id
+    } = req.body;
+
+
+    // Validation
+    if (project_id == undefined ||
+        pro_stud_id === undefined ||
+        !ref_name ||
+        !ref_email ||
+        !ref_contact ||
+        earnings === undefined
+    ) {
+        return res.status(400).json('All fields are required');
+    }
+
+    const parsedpro_stud_id = parseInt(pro_stud_id);
+    const parsedproject_id = parseInt(project_id);
+    const parsedEarnings = parseFloat(earnings);
+
+    if (isNaN(parsedproject_id) || isNaN(parsedpro_stud_id) || isNaN(parsedEarnings)) {
+        return res.status(400).json('Invalid training_id, student_id, or earnings');
+    }
+
+    const query = `
+    INSERT INTO tbl_project_reference (pro_stud_id, project_id, ref_name, ref_email, ref_contact, earnings)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+
+    try {
+        console.log("hi");
+
+        const [result] = await db.query(query, [
+            parsedpro_stud_id,
+            parsedproject_id,
+            ref_name,
+            ref_email,
+            ref_contact,
+            parsedEarnings
+        ]);
+        console.log('Reference data saved successfully');
+
+        return res.status(200).json({ message: 'Reference data saved successfully' });
+    } catch (err) {
+        console.error("Database insert error:", err.message);
+        return res.status(500).json({ error: err.message });
+    }
+});
+
+
 module.exports = router

@@ -179,7 +179,7 @@ function ProjectHome() {
 
         const fetchEarnings = async () => {
           try {
-            const res = await TokenRequest.get(`/student/earnings?student_id=${logininfom.student_id}`);
+            const res = await TokenRequest.get(`/project/earnings?pro_stud_id=${logininfom.trainingIdArrayProject[0]}`);;
 
             setCoinsEarned(res.data.total_earnings)
 
@@ -188,7 +188,7 @@ function ProjectHome() {
           }
         };
 
-        // fetchEarnings()
+        fetchEarnings()
       }
 
       billhome();
