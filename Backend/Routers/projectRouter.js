@@ -259,5 +259,44 @@ router.post('/addreferencedata', verifyToken, async (req, res) => {
     }
 });
 
+// change password
+router.post('/change-password', verifyToken, async (req, res) => {
+    const { pro_stud_id, currentPassword, newPassword } = req.body;
+    if (!pro_stud_id || !currentPassword || !newPassword) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
+    try {
+        const query = 'SELECT * FROM tbl_project_student WHERE pro_stud_id = ?';
+        var [results3] = await db.query(query, [pro_stud_id])
+        console.log(results3);
+        var email = results3[0].email
+        if (results3) {
+            const [results] = await db.query('SELECT * FROM tbl_login WHERE username = ?', [email]);
+            if (results.length === 0) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+            const user = results[0];
+            console.log(user);
+
+            if (currentPassword !== user.password) {
+                return res.status(401).json({ message: 'Current password is incorrect' });
+            }
+            await db.query('UPDATE tbl_login SET password = ? WHERE username = ?', [newPassword, email]);
+            return res.status(200).json({ message: 'Password updated successfully' });
+
+        } else {
+            res.status(404).json('not found data')
+        }
+
+    } catch (err) {
+
+        console.error('Error updating password:', err);
+        return res.status(500).json({ error: 'Database error' });
+    }
+});
+
+
+
+
 
 module.exports = router

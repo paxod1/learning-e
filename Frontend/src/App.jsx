@@ -16,6 +16,7 @@ import ProjectProtect from './components/ProjectProtect';
 import { LogoutData } from './Redux/UserSlice';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProjectClassVideo from './pages/ProjectClassVideos';
+import ProChangePas from './pages/ProChangePas';
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
           <Route element={<ProjectProtect />}>
             <Route path='/' element={id ? <ProjectHome /> : <Home />} />
             <Route path='/Class-video' element={id ? <ProjectClassVideo /> : <Home />} />
+            <Route path='/Project-change-pass' element={id ? <ProChangePas/> : <Home />} />
           </Route>
         </Routes>
       </Router>

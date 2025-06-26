@@ -572,7 +572,7 @@ function ProjectHome() {
 
 
 
-                <Link to={'/ChangePass'} className='change_password_button' >Change Password</Link>
+                <Link to={'/Project-change-pass'} className='change_password_button' >Change Password</Link>
 
                 <h3 onClick={logout} className='menus_right'><AiOutlineLogout />  </h3>
 

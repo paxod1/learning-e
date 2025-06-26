@@ -31,6 +31,7 @@ router.post('/login', async (req, res) => {
                 return res.status(401).json({ message: 'Invalid username or password' });
             }
             console.log("user>", user);
+
             if (user.type == 'project') {
                 console.log("Hi");
 
@@ -40,15 +41,15 @@ router.post('/login', async (req, res) => {
                 const token = jwt.sign({ id: user.id }, process.env.seckey, { expiresIn: '7d' });
                 console.log("login sucess");
                 const querytofindTrainingIds = 'SELECT * FROM tbl_project WHERE pro_stud_id = ?';
-                
-                
+
+
                 var [results4] = await db.query(querytofindTrainingIds, [results3[0].pro_stud_id]);
                 console.log('>>>>>>>>>', results4);
 
                 // Extract only the training_id values into an array
                 var trainingIdArrayProject = results4.map(item => item.project_id);
                 console.log(trainingIdArrayProject);
-                
+
                 return res.status(200).json({ pro_stud_id: results3[0].pro_stud_id, token, trainingIdArrayProject });
 
             } else {
@@ -330,18 +331,28 @@ router.post('/change-password', verifyToken, async (req, res) => {
         return res.status(400).json({ message: 'All fields are required' });
     }
     try {
-        const [results] = await db.query('SELECT * FROM tbl_login1 WHERE student_id = ?', [student_id]);
-        if (results.length === 0) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        const user = results[0];
-        console.log(user);
+        const query = 'SELECT * FROM tbl_student WHERE student_id = ?';
+        var [results3] = await db.query(query, [student_id])
+        console.log(results3);
+        var email = results3[0].email
+        if (results3) {
+            const [results] = await db.query('SELECT * FROM tbl_login WHERE username = ?', [email]);
+            if (results.length === 0) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+            const user = results[0];
+            console.log(user);
 
-        if (currentPassword !== user.password) {
-            return res.status(401).json({ message: 'Current password is incorrect' });
+            if (currentPassword !== user.password) {
+                return res.status(401).json({ message: 'Current password is incorrect' });
+            }
+            await db.query('UPDATE tbl_login SET password = ? WHERE username = ?', [newPassword, email]);
+            return res.status(200).json({ message: 'Password updated successfully' });
+
+        } else {
+            res.status(404).json('not found data')
         }
-        await db.query('UPDATE tbl_login1 SET password = ? WHERE student_id = ?', [newPassword, user.student_id]);
-        return res.status(200).json({ message: 'Password updated successfully' });
+
     } catch (err) {
 
         console.error('Error updating password:', err);
