@@ -41,8 +41,8 @@ import { IoIosMailUnread } from "react-icons/io";
 import { IoMail } from "react-icons/io5";
 import { FaBell } from "react-icons/fa";
 import { LuBellDot } from "react-icons/lu";
-import { BsCoin } from "react-icons/bs";
-import Earn from './Earn';
+import { BsCoin, BsListTask } from "react-icons/bs";
+import ProjectEarn from './ProjectEarn';
 
 
 /**
@@ -145,7 +145,7 @@ function ProjectHome() {
         try {
           let response = await TokenRequest.get(`/project/getBillDetails?project_id=${logininfom.trainingIdArrayProject[0]}`);
           setDueDate(response.data[response.data.length - 1].due_date ? response.data[response.data.length - 1].due_date : null)
-          console.log(response.data[response.data.length - 1].due_date);
+         
           const lastPayment = response.data[response.data.length - 1];
 
           setPaymentData(lastPayment);
@@ -156,7 +156,7 @@ function ProjectHome() {
         // get student details
         try {
           let response2 = await TokenRequest.get(`/project/getstudent?pro_stud_id=${logininfom.pro_stud_id}`);
-          console.log("details>>>>>>>>>>>>>>", response2);
+          
 
           setSutdent(response2.data[0])
 
@@ -170,7 +170,7 @@ function ProjectHome() {
           let response = await TokenRequest.get(`/project/getGroupDetails?project_id=${logininfom.trainingIdArrayProject[0]}`);
 
           setGroupDetails(response.data[0])
-          console.log("Group details", response.data[0]);
+       
         } catch (error) {
           console.log(error);
 
@@ -202,10 +202,10 @@ function ProjectHome() {
           console.log("hi", groupDetails.project_id);
 
           generalResponse = await TokenRequest.get(`/project/getdataAnnouncementsid?id=${groupDetails.project_id}`);
-          console.log("From mailbox home", generalResponse);
+         
         } else {
           generalResponse = await TokenRequest.get(`/project/getdataAnnouncementsid?group=${groupDetails.pro_type}`);
-          console.log("From mailbox home", generalResponse);
+   
         }
 
         // Handle empty response
@@ -263,13 +263,12 @@ function ProjectHome() {
         case 'batchDetails':
           setActiveSection('batchDetails');
           response = await TokenRequest.get(`/project/getGroupDetails?project_id=${logininfom.trainingIdArrayProject[0]}`);
-          console.log('batch details', response.data);
 
           setBatch(response.data);
 
           var group = response.data[0]?.pro_type || 'No Batch Assigned';
           setBatchname(group);
-          console.log('batch details>>>>>>>>>>>>>>>', response.data[0]?.pro_type);
+        
 
 
           var statuscheck = ' '
@@ -328,12 +327,12 @@ function ProjectHome() {
 
         case 'material':
           setActiveSection('material');
-          console.log(groupDetails);
+     
 
           if (groupDetails.pro_type === 'Single Project') {
 
             const response1 = await TokenRequest.get(`/project/getdatamaterial?id=${groupDetails.project_id}`);
-            console.log(response1.data);
+        
             if (response1.data.length === 0) {
               setMaterial([]);
               setActiveSection(' ');
@@ -360,14 +359,14 @@ function ProjectHome() {
           setActiveSection('announcement');
           setLoading(true);
           setNodata(false);
-          console.log("Maildata>>>>>>.", groupDetails);
+         
 
           try {
             if (groupDetails.pro_type === 'Single Project') {
-              console.log("hi", groupDetails.project_id);
+             
 
               const response = await TokenRequest.get(`/project/getdataAnnouncementsid?id=${groupDetails.project_id}`);
-              console.log("From mailbox", response);
+              
 
               if (response.length === 0) {
                 setAnnouncement([]);
@@ -377,7 +376,7 @@ function ProjectHome() {
               }
             } else {
               const response = await TokenRequest.get(`/project/getdataAnnouncementsid?group=${groupDetails.pro_type}`);
-              console.log("From mailbox", response);
+           
               if (response.length === 0) {
                 setAnnouncement([]);
                 setNodata(true);
@@ -611,9 +610,6 @@ function ProjectHome() {
                 <h3><FaNoteSticky style={{ marginRight: '4%', height: '20px', width: '20px' }} /><span className='menus_side_home'>Study Material</span></h3>
               </div>
 
-              <Link className={`topsection_card_userhomepage ${activeMenu === 'website' ? 'active' : ''}`} to={'/Aptitude'} >
-                <h3><PiExamFill style={{ marginRight: '4%', height: '20px', width: '20px' }} /><span className='menus_side_home'>Test</span></h3>
-              </Link>
               <button style={{ fontSize: '15px' }} className={`topsection_card_userhomepage_buttons ${activeMenu === 'helpSupport' ? 'active' : ''}`} onClick={() => fetchData('helpSupport')}>
                 <div><RiCustomerService2Fill style={{ marginRight: '4%', height: '20px', width: '20px' }} /><span className='menus_side_home'>Help & Support</span></div>
               </button>
@@ -757,7 +753,7 @@ function ProjectHome() {
 
                 {activeSection === 'earn' && (
                   <div>
-                    <Earn />
+                    <ProjectEarn />
                   </div>
                 )}
 
@@ -1068,7 +1064,7 @@ function ProjectHome() {
 
                                   </div>
                                 ) : (
-                                  <p>No payment details available</p>
+                                 ''
                                 )}
                               </div>
 
@@ -1084,9 +1080,9 @@ function ProjectHome() {
 
                                 </div>
                                 <div className="batch-body">
-                                  <p><strong><FaIdCard style={{ marginRight: '8px' }} />Student ID:</strong> {batchItem.project_id}</p>
+                                  
 
-                                  <p><strong><FaSchool style={{ marginRight: '8px' }} />Project Topic:</strong> {batchItem.pro_topic || "Not Available"}</p>
+                                  <p><strong><BsListTask style={{ marginRight: '8px' }} />Project Topic:</strong> {batchItem.pro_topic || "Not Available"}</p>
                                   <p><strong><FaSchool style={{ marginRight: '8px' }} />College:</strong> {student.college || "Not Available"}</p>
                                   <p><strong><FaCalendarMinus style={{ marginRight: '8px' }} />Project Category:</strong> {batchItem.pro_category || "Not Available"}</p>
                                   <p><strong><BiLoaderCircle style={{ marginRight: '8px' }} />Project Lanuage:</strong> {batchItem.pro_language}</p>
@@ -1394,30 +1390,7 @@ function ProjectHome() {
                     </h3>
                   </div>
 
-                  <div
-                    className="topsection_card_userhomepage_down-more"
-                    onClick={() => fetchData('Project')}
-                  >
-                    <span className="res_down_menus-more">Project</span>
-                    <h3>
-                      <FaLaptopCode
-                        style={{ marginRight: '4%', height: '25px', width: '25px' }}
-                      />
-                    </h3>
-                  </div>
-
-                  <Link
-                    className="topsection_card_userhomepage_down-more"
-                    style={{ textDecoration: 'none' }}
-                    to={'/Aptitude'}
-                  >
-                    <span className="res_down_menus-more">Test</span>
-                    <h3>
-                      <PiExamFill
-                        style={{ height: '25px', width: '25px' }}
-                      />
-                    </h3>
-                  </Link>
+           
 
                 </div>
               )}

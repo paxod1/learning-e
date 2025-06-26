@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import Footer from "./Footer";
 import { basicRequest, TokenRequest } from "../AxiosCreate";
 import Add from "../components/Add";
+import { IoIosArrowDown } from "react-icons/io";
 
 function ProjectClassVideo() {
   const location = useLocation();
@@ -24,6 +25,7 @@ function ProjectClassVideo() {
   const [activeVideoIndex, setActiveVideoIndex] = useState(null);
   const [showControls, setShowControls] = useState(true);
   const [noVideos, setNoVideos] = useState(false);
+  const [selectedVideoType, setSelectedVideoType] = useState("");
 
   var [addTime, setAddTime] = useState(false)
 
@@ -51,6 +53,8 @@ function ProjectClassVideo() {
           } else {
             response = await TokenRequest.get(`/project/getdatavideos?group=${groupData.pro_type}`);
           }
+          console.log(response.data);
+
 
           if (response.data && response.data.length > 0) {
             setVideos(response.data);
@@ -63,7 +67,7 @@ function ProjectClassVideo() {
           }
 
         } catch (error) {
-          console.error("Error fetching videos:", error);
+
           setNoVideos(true);
         }
       }
@@ -73,10 +77,17 @@ function ProjectClassVideo() {
     }
   }, [logininfom]);
 
+  const filteredVideos = videos.filter((video) => {
+    const matchesSearch = searchQuery
+      ? video.video_title.toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
 
-  const filteredVideos = searchQuery
-    ? videos.filter((video) => video.video_title.toLowerCase().includes(searchQuery.toLowerCase()))
-    : videos;
+    const matchesType = selectedVideoType
+      ? video.video_type === selectedVideoType
+      : true;
+
+    return matchesSearch && matchesType;
+  });
 
   const handleScrubChange = (e) => {
     const seekTime = parseFloat(e.target.value);
@@ -182,7 +193,7 @@ function ProjectClassVideo() {
         </section>
 
         {noVideos ? (
-          <h1 style={{ height: '700px' ,paddingTop:'100px' }}>No Videos Available</h1>
+          <h1 style={{ height: '700px', paddingTop: '100px' }}>No Videos Available</h1>
         ) : (
 
           <section className="video_displaysec">
@@ -284,6 +295,20 @@ function ProjectClassVideo() {
 
               <div className="sidebar p-10">
                 <h4 className="mb-3 text-white">Course Content</h4>
+
+                {/* Add video type dropdown */}
+                <select
+                  value={selectedVideoType}
+                  onChange={(e) => setSelectedVideoType(e.target.value)}
+                  className="form-control mb-3"
+                >
+                  <option value="">Select Video By Type  </option>
+                  <option value="">All Types</option>
+                  {Array.from(new Set(videos.map(video => video.video_type))).map((type, index) => (
+                    <option key={index} value={type}>{type}</option>
+                  ))}
+                </select>
+
                 <input
                   type="text"
                   value={searchQuery}
@@ -311,8 +336,9 @@ function ProjectClassVideo() {
                     <p>No videos found with the selected title.</p>
                   )}
                 </ul>
-
               </div>
+
+
             </div>
           </section>
         )}

@@ -43,6 +43,7 @@ import { FaBell } from "react-icons/fa";
 import { LuBellDot } from "react-icons/lu";
 import { BsCoin } from "react-icons/bs";
 import Earn from './Earn';
+import { SiGooglemeet } from "react-icons/si";
 
 
 /**
@@ -82,6 +83,7 @@ function Home() {
   const [selectedType, setSelectedType] = useState('batch');   // Toggle between 'batch' or 'personal'
   const [coinsEarned, setCoinsEarned] = useState();
   const logininfom = useSelector((state) => state.userlogin?.LoginInfo[0]); // Gets login info from Redux
+  var [classLinkDetails, setClassLinkDetails] = useState()
 
 
   const handleViewMore = (item) => {
@@ -214,12 +216,14 @@ function Home() {
 
         try {
           const res = await TokenRequest.get(`/student/getLink?batchname=${batchname}`);
-          console.log("from link api ", res.data);
+          console.log("from link api ", res.data[0]);
+          setClassLinkDetails(res.data[0])
 
         } catch (error) {
           console.log(error);
 
         }
+
 
       }
     }
@@ -1040,11 +1044,13 @@ function Home() {
 
                                   </div>
                                 ) : (
-                                  <p>No payment details available</p>
+                                  ''
                                 )}
                               </div>
 
                               {/** ****************************************************** */}
+
+
 
 
                               <div key={index} className="batch-card">
@@ -1056,14 +1062,27 @@ function Home() {
                                   <p className="status">{batchItem.status || "Status Not Available"}</p>
                                 </div>
                                 <div className="batch-body">
-                                  <p><strong><FaIdCard style={{ marginRight: '8px' }} />Student ID:</strong> {training_id}</p>
                                   <p><strong> <FaClock style={{ marginRight: '8px' }} />Start Time:</strong> {batchItem.start_time || "Not Available"}</p>
                                   <p><strong><FaClock style={{ marginRight: '8px' }} />End Time:</strong> {batchItem.end_time || "Not Available"}</p>
-                                  <p><strong><FaSchool style={{ marginRight: '8px' }} />Course Name:</strong> {batchItem.course_name || "Not Available"}</p>
-                                  <p><strong><FaCalendarMinus style={{ marginRight: '8px' }} />Batch Code:</strong> {batchItem.batch || "Not Available"}</p>
-                                  <p><strong><BiLoaderCircle style={{ marginRight: '8px' }} />Course Duration:</strong> {batchItem.duration} months</p>
                                   <p><strong><FaRegKeyboard style={{ marginRight: '8px' }} />Training Method:</strong> {batchItem.training_method}</p>
                                   <p><strong><IoIosCard style={{ marginRight: '8px' }} />Course Fee:</strong> {batchItem.fee}/-</p>
+
+                                  {
+                                    classLinkDetails ?
+                                      classLinkDetails.status === 'Active' && classLinkDetails.link && (
+                                        <a
+                                          href={classLinkDetails.link}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="meet-button"
+                                        >
+                                          <SiGooglemeet style={{ marginRight: '8px' }} />
+                                          Join Live Class
+                                        </a>
+                                      ) : ''
+                                  }
+
+
                                 </div>
                               </div>
 
@@ -1095,6 +1114,8 @@ function Home() {
                             <p className="no-material">No materials yet now</p>
                           </div>
                         ) : (
+
+                          
                           <ul className="material-list">
                             {material.map((item) => {
                               const fileUrl = `https://techwingsys.com/billtws/uploads/material/${item.material_file}`;
@@ -1121,6 +1142,7 @@ function Home() {
                               );
                             })}
                           </ul>
+
 
                         )}
                       </div>
