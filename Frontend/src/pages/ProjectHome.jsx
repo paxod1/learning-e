@@ -43,6 +43,7 @@ import { FaBell } from "react-icons/fa";
 import { LuBellDot } from "react-icons/lu";
 import { BsCoin, BsListTask } from "react-icons/bs";
 import ProjectEarn from './ProjectEarn';
+import DocUpload from '../components/DocUpload';
 
 
 /**
@@ -81,6 +82,7 @@ function ProjectHome() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedType, setSelectedType] = useState('batch');   // Toggle between 'batch' or 'personal'
   const [coinsEarned, setCoinsEarned] = useState();
+  const [showUploadModal, setShowUploadModal] = useState(false);
   const logininfom = useSelector((state) => state.userlogin?.LoginInfo[0]); // Gets login info from Redux
 
 
@@ -145,7 +147,7 @@ function ProjectHome() {
         try {
           let response = await TokenRequest.get(`/project/getBillDetails?project_id=${logininfom.trainingIdArrayProject[0]}`);
           setDueDate(response.data[response.data.length - 1].due_date ? response.data[response.data.length - 1].due_date : null)
-         
+
           const lastPayment = response.data[response.data.length - 1];
 
           setPaymentData(lastPayment);
@@ -156,7 +158,7 @@ function ProjectHome() {
         // get student details
         try {
           let response2 = await TokenRequest.get(`/project/getstudent?pro_stud_id=${logininfom.pro_stud_id}`);
-          
+
 
           setSutdent(response2.data[0])
 
@@ -170,7 +172,7 @@ function ProjectHome() {
           let response = await TokenRequest.get(`/project/getGroupDetails?project_id=${logininfom.trainingIdArrayProject[0]}`);
 
           setGroupDetails(response.data[0])
-       
+
         } catch (error) {
           console.log(error);
 
@@ -202,10 +204,10 @@ function ProjectHome() {
           console.log("hi", groupDetails.project_id);
 
           generalResponse = await TokenRequest.get(`/project/getdataAnnouncementsid?id=${groupDetails.project_id}`);
-         
+
         } else {
           generalResponse = await TokenRequest.get(`/project/getdataAnnouncementsid?group=${groupDetails.pro_type}`);
-   
+
         }
 
         // Handle empty response
@@ -268,7 +270,7 @@ function ProjectHome() {
 
           var group = response.data[0]?.pro_type || 'No Batch Assigned';
           setBatchname(group);
-        
+
 
 
           var statuscheck = ' '
@@ -327,12 +329,12 @@ function ProjectHome() {
 
         case 'material':
           setActiveSection('material');
-     
+
 
           if (groupDetails.pro_type === 'Single Project') {
 
             const response1 = await TokenRequest.get(`/project/getdatamaterial?id=${groupDetails.project_id}`);
-        
+
             if (response1.data.length === 0) {
               setMaterial([]);
               setActiveSection(' ');
@@ -359,14 +361,14 @@ function ProjectHome() {
           setActiveSection('announcement');
           setLoading(true);
           setNodata(false);
-         
+
 
           try {
             if (groupDetails.pro_type === 'Single Project') {
-             
+
 
               const response = await TokenRequest.get(`/project/getdataAnnouncementsid?id=${groupDetails.project_id}`);
-              
+
 
               if (response.length === 0) {
                 setAnnouncement([]);
@@ -376,7 +378,7 @@ function ProjectHome() {
               }
             } else {
               const response = await TokenRequest.get(`/project/getdataAnnouncementsid?group=${groupDetails.pro_type}`);
-           
+
               if (response.length === 0) {
                 setAnnouncement([]);
                 setNodata(true);
@@ -393,17 +395,10 @@ function ProjectHome() {
           break;
 
 
-        //     case 'Project':
-        //       setActiveSection('Project');
-        //       response = await TokenRequest.get(`/student/getProjects?training_id=${training_id}`);
+        case 'Project':
+          setActiveSection('Project');
 
-        //       if (response.data.length === 0) {
-        //         setActiveSection(' ');
-        //         setNodata(true)
-        //       } else {
-        //         setProject(response.data)
-        //       }
-        //       break;
+          break;
 
         //     case 'personalannouncement':
         //       setActiveSection('personalannouncement');
@@ -418,17 +413,17 @@ function ProjectHome() {
         //       }
         //       break;
 
-        //     case 'task':
-        //       setActiveSection('task');
-        //       response = await TokenRequest.get(`/student/getTasks?training_id=${training_id}`);
-        //       if (response.data.length === 0) {
-        //         setTask([]);
-        //         setActiveSection(' ');
-        //         setNodata(true)
-        //       } else {
-        //         setTask(response.data);
-        //       }
-        //       break;
+        // case 'task':
+        //   setActiveSection('task');
+        //   response = await TokenRequest.get(`/student/getTasks?training_id=${training_id}`);
+        //   if (response.data.length === 0) {
+        //     setTask([]);
+        //     setActiveSection(' ');
+        //     setNodata(true)
+        //   } else {
+        //     setTask(response.data);
+        //   }
+        //   break;
 
         //     case 'tests':
         //       setActiveSection('tests');
@@ -745,7 +740,6 @@ function ProjectHome() {
 
 
 
-                {/*  Sections tasks*/}
 
                 {
                   taskForm && <TaskReply />
@@ -756,6 +750,9 @@ function ProjectHome() {
                     <ProjectEarn />
                   </div>
                 )}
+
+
+                {/*  Sections tasks*/}
 
                 {activeSection === 'task' && (
                   <div className="task-container">
@@ -840,68 +837,38 @@ function ProjectHome() {
 
                 {/*  Sections Projects*/}
 
-                {
-                  activeSection === 'Project' &&
-                  (project.length === 0 ? (
-                    <div className="box-notdata">
-                      <h4>No Project Yet Now</h4>
+                {activeSection === 'Project' && (
+                  <div className="project-docs-section">
+                    <div className="section-header">
+                      <h3>Project Submission</h3>
+                      <p>Upload your project files and documentation</p>
                     </div>
-                  ) : (
-                    <div className="project-container">
-                      <h1 className="project-title">Project Records</h1>
 
-                      {/* Project Summary with Icons */}
-                      <div className="project-summary">
-                        <div className="summary-box total">
-                          <FaTasks className="summary-icon totalicon" />
-                          <p className="text_total_inner">Total Projects: {project.length}</p>
-                        </div>
-                        <div className="summary-box delayed">
-                          <FaExclamationTriangle className="summary-icon" />
-                          <p className="text_total_inner">
-                            Delayed: {project.filter(proj => proj.project_status === 'delayed').length}
-                          </p>
-                        </div>
-                        <div className="summary-box pending">
-                          <FaHourglassHalf className="summary-icon" />
-                          <p className="text_total_inner">
-                            Pending: {project.filter(proj => proj.project_status === 'pending').length}
-                          </p>
-                        </div>
-                        <div className="summary-box completed">
-                          <FaCheckCircle className="summary-icon" />
-                          <p className="text_total_inner">
-                            Completed: {project.filter(proj => proj.project_status === 'completed').length}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Project Table */}
-                      <div className="project-content">
-                        <table className="project-table">
-                          <thead>
-                            <tr>
-                              <th>Project Name</th>
-                              <th>Project Started</th>
-                              <th>Deadline</th>
-                              <th>Status</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {project.map((proj, index) => (
-                              <tr key={index} className={`project-status-${proj.project_status.toLowerCase()}`}>
-                                <td>{proj.project_description}</td>
-                                <td>{new Date(proj.date_created).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}</td>
-                                <td>{new Date(proj.deadline).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}</td>
-                                <td>{proj.project_status}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                    <div className="docs-card">
+                      <div className="card-content">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4a6cf7" strokeWidth="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14 2 14 8 20 8"></polyline>
+                          <line x1="16" y1="13" x2="8" y2="13"></line>
+                          <line x1="16" y1="17" x2="8" y2="17"></line>
+                          <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        <h4>Submit Your Project</h4>
+                        <p>Upload your project ZIP file and documentation</p>
+                        <button
+                          className="upload-docs-button"
+                          onClick={() => setShowUploadModal(true)}
+                        >
+                          Upload Project
+                        </button>
                       </div>
                     </div>
-                  ))
-                }
+
+                    {showUploadModal && (
+                      <DocUpload onClose={() => setShowUploadModal(false)} />
+                    )}
+                  </div>
+                )}
 
 
 
@@ -1064,7 +1031,7 @@ function ProjectHome() {
 
                                   </div>
                                 ) : (
-                                 ''
+                                  ''
                                 )}
                               </div>
 
@@ -1080,7 +1047,7 @@ function ProjectHome() {
 
                                 </div>
                                 <div className="batch-body">
-                                  
+
 
                                   <p><strong><BsListTask style={{ marginRight: '8px' }} />Project Topic:</strong> {batchItem.pro_topic || "Not Available"}</p>
                                   <p><strong><FaSchool style={{ marginRight: '8px' }} />College:</strong> {student.college || "Not Available"}</p>
@@ -1390,7 +1357,7 @@ function ProjectHome() {
                     </h3>
                   </div>
 
-           
+
 
                 </div>
               )}

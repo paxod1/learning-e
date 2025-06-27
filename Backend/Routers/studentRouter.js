@@ -37,6 +37,8 @@ router.post('/login', async (req, res) => {
 
                 const query = 'SELECT * FROM tbl_project_student WHERE email = ?';
                 var [results3] = await db.query(query, [username])
+                console.log(">>>>>>>>>dataproject", results3);
+
                 console.log(results3[0].pro_stud_id);
                 const token = jwt.sign({ id: user.id }, process.env.seckey, { expiresIn: '7d' });
                 console.log("login sucess");

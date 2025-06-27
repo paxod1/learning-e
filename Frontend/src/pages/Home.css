@@ -2599,3 +2599,63 @@ color: white;
   }
 
 }
+
+
+
+.project-docs-section {
+  padding: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.section-header h3 {
+  font-size: 20px;
+  color: #2d3748;
+  margin-bottom: 8px;
+}
+
+.section-header p {
+  color: #718096;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.docs-card {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.card-content {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.card-content h4 {
+  margin: 16px 0 8px;
+  color: #2d3748;
+}
+
+.card-content p {
+  color: #718096;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.upload-docs-button {
+  background-color: #4a6cf7;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.upload-docs-button:hover {
+  background-color: #3b5bdb;
+}
