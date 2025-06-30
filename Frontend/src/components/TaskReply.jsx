@@ -3,6 +3,7 @@ import axios from 'axios';
 import './TaskReply.css';
 import { TokenRequest } from '../AxiosCreate';
 import { useSelector } from 'react-redux';
+import Swal from 'sweetalert2';
 
 function TaskReply({ task }) {
   const logininfom = useSelector((state) => state.userlogin?.LoginInfo[0]);
@@ -60,6 +61,12 @@ function TaskReply({ task }) {
       });
 
       setSubmitMessage({ text: 'Task submitted successfully!', isError: false });
+      Swal.fire({
+        icon: 'success',
+        title: 'Task submitted successfully!',
+        html: `<p>Your Task submitted successfully.</p>`,
+        confirmButtonText: 'OK'
+      });
       setTimeout(() => {
         setIsOpen(false);
         setDescription('');

@@ -10,13 +10,11 @@ router.post('/login', async (req, res) => {
     console.log(username, password);
 
     if (!username || !password) {
-        console.log(1);
+
         return res.status(400).json({ message: 'Please provide username and password' });
     }
     try {
-        console.log(2);
         const [results] = await db.query('SELECT * FROM tbl_login WHERE username = ?', [username]);
-        console.log("data>>>>>>>>>>>.", results[0]);
 
 
         const user = results[0];
@@ -25,21 +23,21 @@ router.post('/login', async (req, res) => {
 
             return res.status(401).json({ message: 'Invalid username or password' });
         } else {
-            console.log(3);
+     
 
             if (password !== user.password) {
                 return res.status(401).json({ message: 'Invalid username or password' });
             }
-            console.log("user>", user);
+      
 
             if (user.type == 'project') {
-                console.log("Hi");
+          
 
                 const query = 'SELECT * FROM tbl_project_student WHERE email = ?';
                 var [results3] = await db.query(query, [username])
-                console.log(">>>>>>>>>dataproject", results3);
+             
 
-                console.log(results3[0].pro_stud_id);
+             
                 const token = jwt.sign({ id: user.id }, process.env.seckey, { expiresIn: '7d' });
                 console.log("login sucess");
                 const querytofindTrainingIds = 'SELECT * FROM tbl_project WHERE pro_stud_id = ?';
@@ -709,6 +707,30 @@ router.get('/getLink', verifyToken, async (req, res) => {
 
         if (results.length === 0) {
             return res.status(404).json('No Class link found for this batch');
+        }
+        return res.status(200).json(results);
+    } catch (err) {
+        console.error("Query execution error:", err.message);
+        return res.status(500).json({ error: err.message });
+    }
+});
+
+
+// data geting students project review
+router.get('/getProjectReview', verifyToken, async (req, res) => {
+    const { training_id } = req.query;
+    if (!training_id) {
+        return res.status(400).json('training_id is required');
+    }
+    const parsedStudentId = parseInt(training_id);
+    if (isNaN(parsedStudentId)) {
+        return res.status(400).json('Invalid training_id');
+    }
+    const query = 'SELECT * FROM tbl_reviews WHERE training_id = ?';
+    try {
+        const [results] = await db.query(query, [parsedStudentId]);
+        if (results.length === 0) {
+            return res.status(404).json('Student not found');
         }
         return res.status(200).json(results);
     } catch (err) {

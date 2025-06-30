@@ -10,7 +10,6 @@ router.get('/getstudent', verifyToken, async (req, res) => {
     try {
         const query = 'SELECT * FROM tbl_project_student WHERE pro_stud_id = ?';
         var [results3] = await db.query(query, [pro_stud_id])
-        console.log(pro_stud_id);
         res.status(200).json(results3)
 
     } catch (err) {
@@ -25,7 +24,6 @@ router.get('/getGroupDetails', async (req, res) => {
     try {
         const querytofindTrainingIds = 'SELECT * FROM tbl_project WHERE project_id = ?';
         var [results4] = await db.query(querytofindTrainingIds, project_id);
-        console.log(results4);
         res.status(200).json(results4)
 
     } catch (err) {
@@ -41,7 +39,6 @@ router.get('/getBillDetails', verifyToken, async (req, res) => {
     try {
         const querytofindTrainingIds = 'SELECT * FROM tbl_project_bill WHERE project_id = ?';
         var [results4] = await db.query(querytofindTrainingIds, project_id);
-        console.log(results4);
         res.status(200).json(results4)
 
     } catch (err) {
@@ -53,18 +50,18 @@ router.get('/getBillDetails', verifyToken, async (req, res) => {
 
 // get attendance router
 router.get('/getdataattendance', verifyToken, async (req, res) => {
-    const { training_id, year, month } = req.query;
+    const { pro_stud_id, year, month } = req.query;
 
-    if (!training_id) {
+    if (!pro_stud_id) {
         return res.status(400).json('training_id is required');
     }
-    const parsedStudentId = parseInt(training_id);
+    const parsedStudentId = parseInt(pro_stud_id);
     if (isNaN(parsedStudentId)) {
         return res.status(400).json('Invalid training_id');
     }
     console.log(parsedStudentId);
 
-    let query = 'SELECT * FROM tbl_project_attendance WHERE project_id = ?';
+    let query = 'SELECT * FROM tbl_project_attendance WHERE pro_stud_id = ?';
     let queryParams = [parsedStudentId];
     if (year && month) {
         query += ' AND YEAR(date_taken) = ? AND MONTH(date_taken) = ?';
@@ -88,7 +85,6 @@ router.get('/getdataattendance', verifyToken, async (req, res) => {
 
 router.get('/getdatavideos', verifyToken, async (req, res) => {
     const { id, group } = req.query;
-    console.log(id, group);
 
     let query = '';
     let param = '';
@@ -104,7 +100,6 @@ router.get('/getdatavideos', verifyToken, async (req, res) => {
     }
     try {
         const [results] = await db.query(query, [param]);
-        console.log("videos", results);
 
         if (results.length === 0) {
             return res.status(404).json('No videos found');
@@ -118,7 +113,6 @@ router.get('/getdatavideos', verifyToken, async (req, res) => {
 // study material
 router.get('/getdatamaterial', verifyToken, async (req, res) => {
     const { id, group } = req.query;
-    console.log("Material query params:", id, group);
 
     let query = '';
     let param = '';
@@ -147,11 +141,9 @@ router.get('/getdatamaterial', verifyToken, async (req, res) => {
 
 // mail router
 router.get('/getdataAnnouncementsid', verifyToken, async (req, res) => {
-    console.log("hi");
+  
 
     const { id, group } = req.query;
-    console.log("Announcement query params:", id, group);
-
     let query = '';
     let param = '';
 
@@ -167,7 +159,6 @@ router.get('/getdataAnnouncementsid', verifyToken, async (req, res) => {
 
     try {
         const [results] = await db.query(query, [param]);
-        console.log(results);
 
         if (results.length === 0) {
             return res.status(404).json('No announcements found');
@@ -204,7 +195,7 @@ router.get('/earnings', async (req, res) => {
 
 // add reference data
 router.post('/addreferencedata', verifyToken, async (req, res) => {
-     console.log("Received reference data:", req.body);
+
     const {
         ref_name,
         ref_email,
@@ -240,7 +231,6 @@ router.post('/addreferencedata', verifyToken, async (req, res) => {
   `;
 
     try {
-        console.log("hi");
 
         const [result] = await db.query(query, [
             parsedpro_stud_id,
@@ -250,7 +240,6 @@ router.post('/addreferencedata', verifyToken, async (req, res) => {
             ref_contact,
             parsedEarnings
         ]);
-        console.log('Reference data saved successfully');
 
         return res.status(200).json({ message: 'Reference data saved successfully' });
     } catch (err) {
@@ -268,7 +257,6 @@ router.post('/change-password', verifyToken, async (req, res) => {
     try {
         const query = 'SELECT * FROM tbl_project_student WHERE pro_stud_id = ?';
         var [results3] = await db.query(query, [pro_stud_id])
-        console.log(results3);
         var email = results3[0].email
         if (results3) {
             const [results] = await db.query('SELECT * FROM tbl_login WHERE username = ?', [email]);
@@ -276,7 +264,7 @@ router.post('/change-password', verifyToken, async (req, res) => {
                 return res.status(404).json({ message: 'User not found' });
             }
             const user = results[0];
-            console.log(user);
+
 
             if (currentPassword !== user.password) {
                 return res.status(401).json({ message: 'Current password is incorrect' });
@@ -304,7 +292,7 @@ const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({
     storage: storage,
-    limits: { 
+    limits: {
         fileSize: 500 * 1024 * 1024, // 500MB limit for each file
         files: 2 // Maximum 2 files (project and documentation)
     }
@@ -347,10 +335,10 @@ router.post('/submit-project', verifyToken, upload.fields([
     { name: 'projectFile', maxCount: 1 },
     { name: 'documentationFile', maxCount: 1 }
 ]), async (req, res) => {
-    const { project_id } = req.body;
+    const { project_id, pro_stud_id } = req.body;
 
-    if (!project_id) {
-        return res.status(400).json({ message: 'Project ID is required' });
+    if (!project_id, !pro_stud_id) {
+        return res.status(400).json({ message: 'Project ID and pro_stud_id is required' });
     }
 
     try {
@@ -371,15 +359,17 @@ router.post('/submit-project', verifyToken, upload.fields([
 
         // Save submission record to DB
         const submissionQuery = `
-            INSERT INTO tbl_project_upload
-            (project_id, project_file, documentation_file, submitted_at) 
-            VALUES (?, ?, ?, NOW())
-        `;
-        
+    INSERT INTO tbl_project_upload
+    (project_id, project_file, project_doc, pro_stud_id, upload_date) 
+    VALUES (?, ?, ?, ?, NOW())
+`;
+
+
         const [submissionResult] = await db.query(submissionQuery, [
             project_id,
             projectFileName,
-            documentationFileName
+            documentationFileName,
+            pro_stud_id
         ]);
 
         res.status(201).json({

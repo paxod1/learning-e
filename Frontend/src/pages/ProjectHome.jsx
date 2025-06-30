@@ -181,7 +181,7 @@ function ProjectHome() {
 
         const fetchEarnings = async () => {
           try {
-            const res = await TokenRequest.get(`/project/earnings?pro_stud_id=${logininfom.trainingIdArrayProject[0]}`);;
+            const res = await TokenRequest.get(`/project/earnings?pro_stud_id=${logininfom.pro_stud_id}`);;
 
             setCoinsEarned(res.data.total_earnings)
 
@@ -301,7 +301,7 @@ function ProjectHome() {
 
         case 'attendance':
           setActiveSection('attendance');
-          response = await TokenRequest.get(`/project/getdataattendance?training_id=${training_id}&year=${selectedYear}&month=${selectedMonth}`);
+          response = await TokenRequest.get(`/project/getdataattendance?pro_stud_id=${logininfom.pro_stud_id}&year=${selectedYear}&month=${selectedMonth}`);
           console.log("from attendance>>", response.data);
 
           if (response.data.length === 0) {
@@ -1174,8 +1174,6 @@ function ProjectHome() {
                     {selectedItem && <ViewAnnou content={selectedItem} onClose={closeViewMore} />}
                   </div>
                 )}
-
-
 
 
 

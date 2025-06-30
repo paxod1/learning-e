@@ -23,13 +23,13 @@ function ProjectEarn() {
     const [showCoins, setShowCoins] = useState(false);
 
     const logininfom = useSelector((state) => state.userlogin?.LoginInfo[0]); // Gets login info from Redux
-    var pro_stud_id = logininfom.trainingIdArrayProject[0]
-    var project_id = logininfom.pro_stud_id
+    var pro_stud_id =  logininfom.pro_stud_id
+    var project_id = logininfom.trainingIdArrayProject[0]
 
     useEffect(() => {
         const fetchEarnings = async () => {
             try {
-                const res = await TokenRequest.get(`/project/earnings?pro_stud_id=${logininfom.trainingIdArrayProject[0]}`);
+                const res = await TokenRequest.get(`/project/earnings?pro_stud_id=${logininfom.pro_stud_id}`);
                 console.log("earinings>>>>>.", res.data.total_earnings);
                 setCoinsEarned(res.data.total_earnings)
 
@@ -144,10 +144,10 @@ function ProjectEarn() {
     const getCurrentReferralLevel = () => {
 
         if (coinsEarned < 500) return 0;
-        if (coinsEarned === 500) return 1;
-        if (coinsEarned === 1250) return 2;
-        if (coinsEarned === 2250) return 3;
-        if (coinsEarned === 3500) return 4;
+        if (coinsEarned <= 500) return 1;
+        if (coinsEarned <= 1250) return 2;
+        if (coinsEarned <= 2250) return 3;
+        if (coinsEarned <= 3500) return 4;
         return 6; // Beyond 5 referrals
     };
 

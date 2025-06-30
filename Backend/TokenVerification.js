@@ -12,8 +12,6 @@ const verifyToken = (req, res, next) => {
         return res.status(401).json("Token is not valid");
       }
       req.user = user; // Attach user to request object
-      console.log('athuntication sucess');
-      
       next(); // Proceed to next middleware
     });
   } else {

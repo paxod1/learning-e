@@ -2,15 +2,18 @@ import React, { useState } from 'react';
 import './DocUpload.css';
 import { useSelector } from 'react-redux';
 import { TokenRequest } from '../AxiosCreate';
+import Swal from 'sweetalert2';
 
 function DocUpload({ onClose }) {
     const [projectFile, setProjectFile] = useState(null);
     const [documentationFile, setDocumentationFile] = useState(null);
     const [isDraggingProject, setIsDraggingProject] = useState(false);
     const [isDraggingDoc, setIsDraggingDoc] = useState(false);
+    var [loading, setLoading] = useState(false)
     const logininfom = useSelector((state) => state.userlogin?.LoginInfo[0]);
 
     var project_id = logininfom.trainingIdArrayProject[0]
+    var pro_stud_id = logininfom.pro_stud_id
 
     const handleProjectFileChange = (e) => {
         setProjectFile(e.target.files[0]);
@@ -45,6 +48,7 @@ function DocUpload({ onClose }) {
     };
 
     const handleUpload = async () => {
+        setLoading(true)
         if (!projectFile || !documentationFile) {
             alert('Please select both files before uploading!');
             return;
@@ -53,17 +57,28 @@ function DocUpload({ onClose }) {
         const formData = new FormData();
         formData.append('projectFile', projectFile);
         formData.append('documentationFile', documentationFile);
-        formData.append('project_id', project_id); // You'll need to get this from props or context
+        formData.append('project_id', project_id);
+        formData.append('pro_stud_id',pro_stud_id)
 
         try {
             const response = await TokenRequest.post('/project/submit-project', formData);
 
-            alert('Project submitted successfully!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Project Uploaded Successfully',
+                html: `
+            <p>Your project has been uploaded.</p>`,
+                confirmButtonText: 'OK'
+            });
+
             onClose();
+
         } catch (error) {
             console.error('Submission failed:', error);
             alert(error.response?.data?.message || 'Failed to submit project');
+
         }
+
     };
 
     return (
@@ -145,13 +160,20 @@ function DocUpload({ onClose }) {
 
                 <div className="modal-actions">
                     <button className="cancel-button" onClick={onClose}>Cancel</button>
-                    <button
-                        className="upload-button"
-                        onClick={handleUpload}
-                        disabled={!projectFile || !documentationFile}
-                    >
-                        Submit Project
-                    </button>
+
+                    {
+                        loading ? <button
+                            className="upload-button"
+                            disabled
+                        >Submiting..  </button> : <button
+                            className="upload-button"
+                            onClick={handleUpload}
+                            disabled={!projectFile || !documentationFile}
+                        >Submit  </button>
+
+                    }
+
+
                 </div>
             </div>
         </div>
