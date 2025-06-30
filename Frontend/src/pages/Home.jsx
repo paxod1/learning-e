@@ -915,7 +915,7 @@ function Home() {
                               <th>Project Started</th>
                               <th>Deadline</th>
                               <th>Status</th>
-                              {/**   <th>Upload</th>    */}
+                               <th>Upload</th> 
                             </tr>
                           </thead>
                           <tbody>
@@ -932,7 +932,7 @@ function Home() {
                                 <td>{new Date(proj.deadline).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}</td>
                                 <td>{proj.project_status}</td>
 
-                                {/** 
+                           
                                 <td
                                   onClick={() => setShowUploadModal(true)}
                                   className="upload-button"
@@ -943,8 +943,7 @@ function Home() {
                                 {showUploadModal && (
                                   <ProjectUpload onClose={() => setShowUploadModal(false)} />
                                 )}
-                                  */}
-
+                               
                                 {/* Hover Review Box */}
                                 {hoveredProjectId === proj.project_id && reviewMap[proj.project_id] && (
                                   <div className="hover-review-box">

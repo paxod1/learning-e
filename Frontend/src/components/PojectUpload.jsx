@@ -8,8 +8,11 @@ function ProjectUpload({ onClose }) {
     const [projectFile, setProjectFile] = useState(null);
     const [isDraggingProject, setIsDraggingProject] = useState(false);
     const [loading, setLoading] = useState(false);
+    const logininfom = useSelector((state) => state.userlogin?.LoginInfo[0]);
+    var training_id = logininfom.selectedTrainingId ? logininfom.selectedTrainingId : logininfom.trainingIdArray[0]
+    var student_id = logininfom.student_id
 
-  
+
 
     const handleProjectFileChange = (e) => {
         setProjectFile(e.target.files[0]);
@@ -41,7 +44,9 @@ function ProjectUpload({ onClose }) {
 
         const formData = new FormData();
         formData.append('projectFile', projectFile);
-     
+        formData.append('training_id', training_id)
+        formData.append('student_id', student_id)
+
 
         try {
             const response = await TokenRequest.post('/student/submit-project', formData);

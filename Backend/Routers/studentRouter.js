@@ -789,12 +789,9 @@ async function uploadToFTP1(fileBuffer, filename) {
 router.post('/submit-project', verifyToken, upload1.fields([
     { name: 'projectFile', maxCount: 1 },
 ]), async (req, res) => {
-    const { project_id, pro_stud_id } = req.body;
+    const { training_id, student_id } = req.body;
 
-    if (!project_id, !pro_stud_id) {
-        return res.status(400).json({ message: 'Project ID and pro_stud_id is required' });
-    }
-
+ 
     try {
         // Upload files to FTP
         let projectFileName = null;
@@ -808,16 +805,14 @@ router.post('/submit-project', verifyToken, upload1.fields([
 
         // Save submission record to DB
         const submissionQuery = `
-    INSERT INTO tbl_project_upload
-    (project_id, project_file, pro_stud_id, upload_date) 
+    INSERT INTO tbl_training_project_upload
+    (student_id, project_file, training_id, upload_date) 
     VALUES (?, ?, ?, NOW())
 `;
-
-
         const [submissionResult] = await db.query(submissionQuery, [
-            project_id,
+            student_id,
             projectFileName,
-            pro_stud_id
+            training_id
         ]);
 
         res.status(201).json({
