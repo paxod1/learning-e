@@ -230,10 +230,7 @@ function ProjectHome() {
       } catch (error) {
         console.warn("Error in announcement processing:", error);
         setHomeAnnouncement([
-          {
-            title: "Connection issue",
-            description: "Collecting data....."
-          }
+          { title: "No announcements", description: "There are no announcements available at this time." }
         ]);
       }
 
