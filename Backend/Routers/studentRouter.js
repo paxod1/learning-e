@@ -743,4 +743,97 @@ router.get('/getProjectReview', verifyToken, async (req, res) => {
 
 
 
+// Multer configuration for handling multiple files
+const storage1 = multer.memoryStorage();
+const upload1 = multer({
+    storage: storage1,
+    limits: {
+        fileSize: 500 * 1024 * 1024, // 500MB limit for each file
+        files: 2 // Maximum 2 files (project and documentation)
+    }
+});
+
+// FTP Upload Function
+async function uploadToFTP1(fileBuffer, filename) {
+    const client = new ftp.Client();
+    try {
+        await client.access({
+            host: "ftp.techwingsys.com",
+            user: "test2@techwingsys.com",
+            password: "9995400671@Test2",
+            secure: false
+        });
+
+        try {
+            await client.ensureDir("billtws/uploads/project");
+        } catch (dirError) {
+            console.log("Directory already exists or couldn't be created");
+        }
+
+        const stream = require('stream');
+        const bufferStream = new stream.PassThrough();
+        bufferStream.end(fileBuffer);
+
+        await client.uploadFrom(bufferStream, filename);
+        console.log("File uploaded to FTP!");
+        return true;
+    } catch (err) {
+        console.error("FTP upload failed:", err);
+        throw err;
+    } finally {
+        client.close();
+    }
+}
+
+// Project Submission Route
+router.post('/submit-project', verifyToken, upload1.fields([
+    { name: 'projectFile', maxCount: 1 },
+]), async (req, res) => {
+    const { project_id, pro_stud_id } = req.body;
+
+    if (!project_id, !pro_stud_id) {
+        return res.status(400).json({ message: 'Project ID and pro_stud_id is required' });
+    }
+
+    try {
+        // Upload files to FTP
+        let projectFileName = null;
+
+        const timestamp = Date.now();
+
+        if (req.files.projectFile) {
+            projectFileName = `project_${timestamp}_${req.files.projectFile[0].originalname}`;
+            await uploadToFTP1(req.files.projectFile[0].buffer, projectFileName);
+        }
+
+        // Save submission record to DB
+        const submissionQuery = `
+    INSERT INTO tbl_project_upload
+    (project_id, project_file, pro_stud_id, upload_date) 
+    VALUES (?, ?, ?, NOW())
+`;
+
+
+        const [submissionResult] = await db.query(submissionQuery, [
+            project_id,
+            projectFileName,
+            pro_stud_id
+        ]);
+
+        res.status(201).json({
+            message: 'Project submitted successfully',
+            submissionId: submissionResult.insertId
+        });
+
+    } catch (err) {
+        console.error('Project submission error:', err);
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(413).json({ message: 'Each file must be less than 500MB' });
+        }
+        res.status(500).json({ message: 'Failed to submit project', error: err.message });
+    }
+});
+
+
+
 module.exports = router;

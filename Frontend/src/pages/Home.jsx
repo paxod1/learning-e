@@ -44,6 +44,7 @@ import { LuBellDot } from "react-icons/lu";
 import { BsCoin } from "react-icons/bs";
 import Earn from './Earn';
 import { SiGooglemeet } from "react-icons/si";
+import ProjectUpload from '../components/PojectUpload';
 
 
 /**
@@ -83,6 +84,7 @@ function Home() {
   const [selectedType, setSelectedType] = useState('batch');   // Toggle between 'batch' or 'personal'
   const [coinsEarned, setCoinsEarned] = useState();
   var [projectReview, setProjectReview] = useState([])
+  const [showUploadModal, setShowUploadModal] = useState(false);
   const logininfom = useSelector((state) => state.userlogin?.LoginInfo[0]); // Gets login info from Redux
   var [classLinkDetails, setClassLinkDetails] = useState()
   const [hoveredProjectId, setHoveredProjectId] = useState(null);
@@ -835,7 +837,7 @@ function Home() {
                               .sort((a, b) => new Date(b.date_assigned) - new Date(a.date_assigned))
                               .map((task, index) => (
                                 <tr key={index} className={`task-status-${task.task_status.toLowerCase()}`}>
-                                  <td>{task.task_description}</td>
+                                  <td dangerouslySetInnerHTML={{ __html: cleanHtml(task.task_description) }}></td>
                                   <td>
                                     {new Date(task.date_assigned).toLocaleDateString('en-IN', {
                                       day: '2-digit',
@@ -913,6 +915,7 @@ function Home() {
                               <th>Project Started</th>
                               <th>Deadline</th>
                               <th>Status</th>
+                              {/**   <th>Upload</th>    */}
                             </tr>
                           </thead>
                           <tbody>
@@ -929,6 +932,19 @@ function Home() {
                                 <td>{new Date(proj.deadline).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}</td>
                                 <td>{proj.project_status}</td>
 
+                                {/** 
+                                <td
+                                  onClick={() => setShowUploadModal(true)}
+                                  className="upload-button"
+                                  style={{ color: 'green', backgroundColor: 'transparent' }}
+                                >
+                                  Upload</td>
+
+                                {showUploadModal && (
+                                  <ProjectUpload onClose={() => setShowUploadModal(false)} />
+                                )}
+                                  */}
+
                                 {/* Hover Review Box */}
                                 {hoveredProjectId === proj.project_id && reviewMap[proj.project_id] && (
                                   <div className="hover-review-box">
@@ -939,20 +955,19 @@ function Home() {
                                           <th>Review Phase</th>
                                           <th>Scheduled Date</th>
                                           <th>Status</th>
-                                          <th>Remarks</th>
+
                                         </tr>
                                       </thead>
                                       <tbody>
                                         {reviewMap[proj.project_id].map((review, i) => (
                                           <tr key={i}>
                                             <td>{review.review_name?.split('â')[0]?.trim() || `Review ${i + 1}`}</td>
-                                            <td>{new Date(review.review_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                                            <td>{new Date(review.review_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} </td>
                                             <td>
                                               <span className={`status-badge ${review.review_status.toLowerCase()}`}>
                                                 {review.review_status}
                                               </span>
                                             </td>
-                                            <td>{review.review_remark || '-'}</td>
                                           </tr>
                                         ))}
                                       </tbody>
@@ -1212,17 +1227,19 @@ function Home() {
                                   <p>{item.material_description}</p>
 
                                   {item.material_file && (
-                                    <a
-                                      href={fileUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        window.open(fileUrl, '_blank', 'noopener,noreferrer');
-                                      }}
-                                    >
-                                      View Material
-                                    </a>
+                                    <div className="material-footer">
+                                      <a
+                                        href={fileUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          window.open(fileUrl, '_blank', 'noopener,noreferrer');
+                                        }}
+                                      >
+                                        View Material
+                                      </a>
+                                    </div>
                                   )}
                                 </li>
                               );
